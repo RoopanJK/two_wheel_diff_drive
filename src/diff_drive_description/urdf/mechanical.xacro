@@ -1,0 +1,208 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- Sensor models -->
+	<xacro:include filename="$(find diff_drive_description)/urdf/sensor.xacro" /> 
+
+    <xacro:macro
+    name="mechanical"
+    params="base_ln_xyz base_ln_rpy base_ln_mass wheel_l_ln wheel_r_ln wheel_l_xyz wheel_r_xyz wheel_l_rpy wheel_r_rpy wheel_mass wheel_rad caster_ln caster_xyz caster_rpy caster_mass lidar_ln lidar_xyz lidar_rpy lidar_mass camera_ln camera_xyz camera_rpy camera_mass imu_ln imu_xyz imu_rpy imu_mass" >
+	
+
+	<link name="base_footprint"/>
+
+	<link name='base_frame'>
+
+		<collision> 
+			<geometry> 
+				<mesh filename="package://diff_drive_description/meshes/main.STL" scale="1 1 1"/>
+			</geometry> 
+		</collision>
+
+		<visual> 
+			<geometry>  
+				<mesh filename="package://diff_drive_description/meshes/main.STL" scale="1 1 1"/>
+			</geometry> 
+			<material name="Gold"/>
+		</visual>
+
+		<inertial> 
+			<origin xyz="-0.1 0 0.1" 
+					rpy="0.01 0.01 1.54"/> 
+			<mass value="${base_ln_mass}"/> 
+			<xacro:box_inertia 
+				m="${base_ln_mass}" 
+				l="0.4" 
+				w="0.4" 
+				h="0.2"/>
+		</inertial>
+	</link>
+
+    <link name='${wheel_l_ln}_link'>
+
+		<collision> 
+			<geometry> 
+				<mesh filename="package://diff_drive_description/meshes/wheel_80mm.STL" scale="1 1 1"/>
+			</geometry> 
+		</collision>
+
+		<visual> 
+			<geometry>  
+				<mesh filename="package://diff_drive_description/meshes/wheel_80mm.STL" scale="1 1 1"/>
+			</geometry>
+			<material name="Red"/>
+		</visual>
+
+		<inertial>
+			<origin xyz="0 0 0" 
+					rpy="1.54 0 0"/>
+			<mass value="${wheel_mass}"/> 
+			<xacro:cylinder_inertia 
+				m="${wheel_mass}"
+                r="${wheel_rad}"
+                h="0.015" 
+            />
+		</inertial>
+
+	</link>
+
+    <link name='${wheel_r_ln}_link'>
+
+		<collision> 
+			<geometry> 
+				<mesh filename="package://diff_drive_description/meshes/wheel_80mm.STL" scale="1 1 1"/>
+			</geometry> 
+		</collision>
+
+		<visual> 
+			<geometry>  
+				<mesh filename="package://diff_drive_description/meshes/wheel_80mm.STL" scale="1 1 1"/>
+			</geometry>
+			<material name="Red"/>
+		</visual>
+
+		<inertial>
+			<origin xyz="0 0 0" 
+					rpy="1.54 0 0"/> 
+			<mass value="${wheel_mass}"/> 
+			<xacro:cylinder_inertia 
+				m="${wheel_mass}"
+                r="${wheel_rad}"
+                h="0.015" 
+            />
+		</inertial>
+
+	</link>
+
+	<link name="${caster_ln}_link">
+
+		<collision>
+			<geometry>
+				<mesh filename="package://diff_drive_description/meshes/caster.STL" scale="1 1 1"/>
+	  		</geometry>
+		</collision>
+
+		<visual> 
+			<geometry>
+				<mesh filename="package://diff_drive_description/meshes/caster.STL" scale="1 1 1"/>
+			</geometry>
+			<material name="Black" />
+		</visual>
+
+		<inertial>
+			<origin xyz="${caster_xyz}" 
+					rpy="${caster_rpy}"/>
+			<mass value="${caster_mass}"/>
+			<xacro:box_inertia 
+				m="${caster_mass}" 
+				l="0.02" 
+				w="0.02" 
+				h="0.02"/>
+		</inertial>
+
+	</link>
+
+	<link name="caster_wheel_link">
+
+		<collision>
+			<origin xyz="0 0 0" 
+					rpy="0 0 0"/>
+			<geometry>
+				<mesh filename="package://diff_drive_description/meshes/caster_wheel.stl" scale="1 1 1"/>
+				</geometry>
+		</collision>
+
+		<visual> 
+			<origin xyz="0 0 0" 
+					rpy="0 0 0"/>
+			<geometry>
+				<mesh filename="package://diff_drive_description/meshes/caster_wheel.stl" scale="1 1 1"/>
+			</geometry>
+			<material name="White" />
+		</visual>
+
+		<inertial>
+			<origin xyz="0 0 0" 
+					rpy="0 0 0"/>
+			<mass value="0.4"/>
+			<xacro:box_inertia 
+				m="0.04" 
+				l="0.04" 
+				w="0.04" 
+				h="0.04"/>
+		</inertial>
+
+	</link>
+
+    <joint name="base_joint" type="fixed">
+		<parent link="base_footprint"/>
+		<child link="base_frame"/>
+		<origin xyz="${base_ln_xyz}" rpy="${base_ln_rpy}"/> 
+	</joint>
+
+    <joint name="${wheel_l_ln}_joint" type="continuous">
+		<parent link="base_frame"/>
+		<child link="${wheel_l_ln}_link"/>
+		<origin xyz="${wheel_l_xyz}" rpy="${wheel_l_rpy}"/>
+		<axis xyz="0.0 1.0 0.0"/>
+		
+	</joint>
+
+    <joint name="${wheel_r_ln}_joint" type="continuous">
+		<parent link="base_frame"/>
+		<child link="${wheel_r_ln}_link"/>
+		<origin xyz="${wheel_r_xyz}" rpy="${wheel_r_rpy}"/>
+		<axis xyz="0.0 1.0 0.0"/>
+		
+	</joint>
+
+    <joint name="${caster_ln}_joint" type="fixed">
+		<parent link="base_frame"/>
+		<child link="${caster_ln}_link"/>
+		<origin xyz="${caster_xyz}" rpy="${caster_rpy}"/>
+	</joint>
+
+	<joint name="caster_wheel_joint" type="continuous">
+		<parent link="${caster_ln}_link"/>
+		<child link="caster_wheel_link"/>
+		<origin xyz="0.0 0 -0.014" rpy="0 0 1.54"/>
+	</joint>
+
+	<xacro:sensor
+	lidar_ln="${lidar_ln}"
+    lidar_xyz="${lidar_xyz}"
+    lidar_rpy="${lidar_rpy}"
+    lidar_mass="${lidar_mass}"
+    camera_ln="${camera_ln}"
+    camera_xyz="${camera_xyz}"
+    camera_rpy="${camera_rpy}"
+    camera_mass="${camera_mass}"
+    imu_ln="${imu_ln}"
+    imu_xyz="${imu_xyz}"
+    imu_rpy="${imu_rpy}"
+    imu_mass="${imu_mass}"
+    />
+
+</xacro:macro>
+</robot>
