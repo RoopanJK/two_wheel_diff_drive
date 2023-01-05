@@ -12,23 +12,31 @@
 
   </include>
 
-    <!-- Load the URDF into the ROS Parameter Server -->
-  <param name="robot_description" command="$(find xacro)/xacro '$(find diff_drive_description)/urdf/diff_drive.xacro'" />
+  <!-- Load the URDF into the ROS Parameter Server -->
+  <param name="robot_description"
+    command="$(find xacro)/xacro '$(find diff_drive_description)/urdf/diff_drive.xacro'" />
 
- <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
-  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" args="-x -4.0 -y -8.5 -z 0.1 -urdf -model diff_drive -param robot_description" />
+  <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+    args="-x -4.0 -y -8.5 -z 0.1 -urdf -model diff_drive -param robot_description" />
 
- <!-- Publishes joint positions - Joint state publisher -->
+  <!-- Publishes joint positions - Joint state publisher -->
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
 
   <!-- Uses URDF and Joint positions to compute transforms of robot -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
-    <!-- Gmapping pacakge for mapping  -->
+  <!-- Gmapping pacakge for mapping  -->
 
   <node name="gmapping" pkg="gmapping" type="slam_gmapping" output="screen">
     <remap from="scan" to="/scan" />
     <rosparam file="$(find diff_drive_simulation)/config/gmapping.yaml" command="load" />
+  </node>
+
+  <!-- Launch Rviz with config file -->
+
+  <node name="rviz" pkg="rviz" type="rviz"
+    args="-d $(find diff_drive_simulation)/config/two_wheel.rviz">
   </node>
 
 </launch>
