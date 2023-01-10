@@ -28,15 +28,23 @@
 
   <!-- Gmapping pacakge for mapping  -->
 
-  <node name="gmapping" pkg="gmapping" type="slam_gmapping" output="screen">
+  <!-- <node name="gmapping" pkg="gmapping" type="slam_gmapping" output="screen">
     <remap from="scan" to="/scan" />
     <rosparam file="$(find diff_drive_simulation)/config/gmapping.yaml" command="load" />
-  </node>
+  </node> -->
 
   <!-- Launch Rviz with config file -->
 
   <node name="rviz" pkg="rviz" type="rviz"
     args="-d $(find diff_drive_simulation)/config/two_wheel.rviz">
+  </node>
+
+   <!-- Map Server -->
+  <node pkg="map_server" name="map_server" type="map_server" args="$(find diff_drive_simulation)/maps/cafe.yaml" />
+
+    <!-- AMCL node -->
+  <node pkg="amcl" type="amcl" name="amcl" output="screen" args="scan:=/scan" >
+    <rosparam file="$(find diff_drive_simulation)/config/amcl.yaml" command="load" />
   </node>
 
 </launch>
